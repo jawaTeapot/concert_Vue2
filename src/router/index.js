@@ -13,12 +13,12 @@ const routes = [
     component: HomeView,
   },
   {
-    path: "/profile",
+    path: "/profile/:id",
     name: "profile",
     component: ProfileView,
   },
   {
-    path: "/post",
+    path: "/post/:id",
     name: "post",
     component: PostView,
   },
@@ -28,6 +28,10 @@ const router = new VueRouter({
   // mode: "history",
   base: process.env.BASE_URL,
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    // always scroll to top
+    document.getElementById("app").scrollIntoView({ behavior: "smooth" });
+  },
 });
 
 export default router;

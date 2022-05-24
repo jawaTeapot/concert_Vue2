@@ -2,7 +2,12 @@
   <div id="app">
     <nav class="header">
       <div class="header__inner container">
-        <img src="@/assets/img/logo.svg" alt="logo" />
+        <img
+          class="header__img"
+          src="@/assets/img/logo.svg"
+          alt="logo"
+          @click="$router.push('/')"
+        />
         <div>
           <button class="header__btn btn-primary">
             Версия для слабовидящих
@@ -32,6 +37,9 @@ body {
 .header {
   height: 70px;
   background-color: #101010;
+  &__img {
+    cursor: pointer;
+  }
   &__inner {
     height: 100%;
     display: flex;

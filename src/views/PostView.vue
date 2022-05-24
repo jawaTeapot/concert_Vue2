@@ -1,13 +1,19 @@
 <template>
   <div class="profile">
     <div class="profile__name container">
-      <h1 class="profile__name-heading">Иванов Семен</h1>
+      <h1 class="profile__name-heading">{{ user.username }}</h1>
     </div>
     <div class="profile__info">
       <div class="profile__info-top container">
-        <p class="profile__city">Санкт-Петербург</p>
-        <p class="profile__email">ivanov@mail.com</p>
-        <p class="profile__phone">+7 (821) 311-21-32</p>
+        <p class="profile__city">{{ user.name }}</p>
+        <p class="profile__email">{{ user.email }}</p>
+        <p class="profile__phone">{{ user.phone }}</p>
+        <p class="profile__website">{{ user.website }}</p>
+        <p class="profile__company">
+          {{ user.company.bs }} {{ user.company.name }}
+        </p>
+      </div>
+      <div class="profile__info-bt container">
         <button class="profile__btn btn-secondary">Написать сообщение</button>
         <button class="profile__btn-right btn-secondary">
           Предложить сходить на концерт
@@ -16,15 +22,11 @@
     </div>
     <div class="post">
       <div class="container">
-        <h2 class="post__header">Заголовок поста</h2>
+        <h2 class="post__header">{{ post.title }}</h2>
         <div class="post__top">
           <div class="post__content">
             <p class="post__text post__text--content">
-              Просто шикарный альбом, Пилоты после Blurryface решили не идти
-              проторенной дорожкой, и сделали что то новое. На мой взгляд у них
-              на 100% получилось, альбом слушается на одном дыхании, каждая
-              песня чем то запоминается, естественно нужно понимать тексты,
-              чтобы вникнуть до конца во весь сюжет и атмосферу альбома....
+              {{ post.body }}
             </p>
           </div>
         </div>
@@ -33,11 +35,26 @@
     <div class="about__right about__right--post container">
       <h4 class="about__right-heading">Оставьте комментарий</h4>
       <form class="about__form">
+        <input
+          v-model="name"
+          class="about__input"
+          type="text"
+          placeholder="Введите имя"
+        />
+        <input
+          v-model="email"
+          class="about__input"
+          type="email"
+          placeholder="Email"
+        />
         <textarea
+          v-model="comment"
           class="about__textarea"
-          placeholder="Расскажите о вашем предложении "
+          placeholder="Комментарий"
         ></textarea>
-        <button class="about__btn btn-secondary">отправить</button>
+        <button @click.prevent="sendComment" class="about__btn btn-secondary">
+          отправить
+        </button>
       </form>
     </div>
   </div>
@@ -48,7 +65,40 @@
 
 export default {
   name: "PostView",
-  components: {},
+  data: function () {
+    return {
+      post: {},
+      user: { company: {} },
+      name: "",
+      email: "",
+      comment: "",
+    };
+  },
+  methods: {
+    sendComment() {
+      const payload = {
+        name: this.name,
+        email: this.email,
+        comment: this.comment,
+        postId: this.$route.params.id,
+      };
+      console.log(payload);
+      this.$store.dispatch("createComment", payload);
+    },
+  },
+  mounted() {
+    this.$store
+      .dispatch("getPost", this.$route.params.id)
+      .then((post) => {
+        this.post = post;
+        return this.$store.dispatch("getUser", post.userId);
+        // this.user = user;
+        // return this.$store.dispatch("getPosts", this.$route.params.id);
+      })
+      .then((user) => {
+        this.user = user;
+      });
+  },
 };
 </script>
 

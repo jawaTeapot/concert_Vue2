@@ -1,13 +1,19 @@
 <template>
   <div class="profile">
     <div class="profile__name container">
-      <h1 class="profile__name-heading">Иванов Семен</h1>
+      <h1 class="profile__name-heading">{{ user.username }}</h1>
     </div>
     <div class="profile__info">
       <div class="profile__info-top container">
-        <p class="profile__city">Санкт-Петербург</p>
-        <p class="profile__email">ivanov@mail.com</p>
-        <p class="profile__phone">+7 (821) 311-21-32</p>
+        <p class="profile__city">{{ user.name }}</p>
+        <p class="profile__email">{{ user.email }}</p>
+        <p class="profile__phone">{{ user.phone }}</p>
+        <p class="profile__website">{{ user.website }}</p>
+        <p class="profile__company">
+          {{ user.company.bs }} {{ user.company.name }}
+        </p>
+      </div>
+      <div class="profile__info-bt container">
         <button class="profile__btn btn-secondary">Написать сообщение</button>
         <button class="profile__btn-right btn-secondary">
           Предложить сходить на концерт
@@ -18,7 +24,20 @@
       <div class="container">
         <h2 class="post__header">Посты</h2>
         <div class="post__top">
-          <div class="post__left">
+          <div
+            class="post__left"
+            v-for="post in posts"
+            :key="post.id"
+            @click="goToPost(post.id)"
+          >
+            <h3 class="post__heading">
+              {{ post.title }} <span>12.01.22</span>
+            </h3>
+            <p class="post__text">
+              {{ post.body }}
+            </p>
+          </div>
+          <!-- <div class="post__right">
             <h3 class="post__heading">
               Twenty One Pilots <span>12.01.22</span>
             </h3>
@@ -29,19 +48,7 @@
               песня чем то запоминается, естественно нужно понимать тексты,
               чтобы вникнуть до конца во весь сюжет и атмосферу альбома....
             </p>
-          </div>
-          <div class="post__right">
-            <h3 class="post__heading">
-              Twenty One Pilots <span>12.01.22</span>
-            </h3>
-            <p class="post__text">
-              Просто шикарный альбом, Пилоты после Blurryface решили не идти
-              проторенной дорожкой, и сделали что то новое. На мой взгляд у них
-              на 100% получилось, альбом слушается на одном дыхании, каждая
-              песня чем то запоминается, естественно нужно понимать тексты,
-              чтобы вникнуть до конца во весь сюжет и атмосферу альбома....
-            </p>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -66,7 +73,30 @@
 
 export default {
   name: "ProfileView",
-  components: {},
+  data: function () {
+    return {
+      user: {
+        company: {},
+      },
+      posts: [],
+    };
+  },
+  methods: {
+    goToPost(postId) {
+      this.$router.push("/post/" + postId);
+    },
+  },
+  mounted() {
+    this.$store
+      .dispatch("getUser", this.$route.params.id)
+      .then((user) => {
+        this.user = user;
+        return this.$store.dispatch("getPosts", this.$route.params.id);
+      })
+      .then((posts) => {
+        this.posts = posts;
+      });
+  },
 };
 </script>
 
@@ -94,9 +124,12 @@ export default {
   &__info-top {
     border: 1px solid #000000;
     border-top: none;
-    border-bottom: none;
     display: flex;
     justify-content: space-between;
+    p {
+      display: flex;
+      align-items: center;
+    }
   }
   &__city {
     border-right: 1px solid #000000;
@@ -106,7 +139,6 @@ export default {
     line-height: 17px;
   }
   &__email {
-    border-right: 1px solid #000000;
     padding: 14px 20px 10px 22px;
     border-right: 1px solid #000000;
     font-weight: 400;
@@ -114,13 +146,33 @@ export default {
     line-height: 17px;
   }
   &__phone {
-    border-right: 1px solid #000000;
     padding: 14px 22px 10px 22px;
     border-right: 1px solid #000000;
     font-weight: 400;
     font-size: 18px;
     line-height: 17px;
     flex: 1;
+  }
+  &__website {
+    padding: 14px 22px 10px 22px;
+    border-right: 1px solid #000000;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 17px;
+    flex: 1;
+  }
+  &__company {
+    padding: 14px 22px 10px 22px;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 17px;
+    flex: 1;
+  }
+  &__info-bt {
+    border: 1px solid #000000;
+    border-top: none;
+    border-bottom: none;
+    text-align: center;
   }
   &__btn {
     padding: 15px 28px;
@@ -141,13 +193,15 @@ export default {
     line-height: 40px;
   }
   &__top {
-    display: flex;
     margin-bottom: 32px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(49%, 1fr));
+    gap: 20px;
   }
   &__left {
     border: 1px solid #000000;
     padding: 14px 35px 17px;
-    margin-right: 20px;
+    cursor: pointer;
   }
   &__right {
     border: 1px solid #000000;

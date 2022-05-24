@@ -43,31 +43,19 @@
         <p class="tickets__text">932/<span>1000</span></p>
       </div>
       <div class="tickets__top">
-        <div class="tickets-user">
-          <h3 class="tickets-user__heading">Иванов семен</h3>
-          <p class="tickets-user__text">Санкт-Петербург</p>
-          <button class="tickets-user__btn btn-secondary">
-            Смотреть профиль
-          </button>
-        </div>
-        <div class="tickets-user">
-          <h3 class="tickets-user__heading">Иванов семен</h3>
-          <p class="tickets-user__text">Санкт-Петербург</p>
-          <button class="tickets-user__btn btn-secondary">
-            Смотреть профиль
-          </button>
-        </div>
-        <div class="tickets-user">
-          <h3 class="tickets-user__heading">Иванов семен</h3>
-          <p class="tickets-user__text">Санкт-Петербург</p>
-          <button class="tickets-user__btn btn-secondary">
-            Смотреть профиль
-          </button>
-        </div>
-        <div class="tickets-user">
-          <h3 class="tickets-user__heading">Иванов семен</h3>
-          <p class="tickets-user__text">Санкт-Петербург</p>
-          <button class="tickets-user__btn btn-secondary">
+        <div class="tickets-user" v-for="user in users" :key="user.id">
+          <h3 class="tickets-user__heading">{{ user.username }}</h3>
+          <p class="tickets-user__text">{{ user.name }}</p>
+          <!-- <p class="tickets-user__text">{{ user.email }}</p>
+          <p class="tickets-user__text">{{ user.phone }}</p>
+          <p class="tickets-user__text">{{ user.website }}</p>
+          <p class="tickets-user__text">
+            {{ user.company.bs }} {{ user.company.name }}
+          </p> -->
+          <button
+            class="tickets-user__btn btn-secondary"
+            @click="goToUser(user)"
+          >
             Смотреть профиль
           </button>
         </div>
@@ -119,7 +107,23 @@
 
 export default {
   name: "HomeView",
-  components: {},
+  data: function () {
+    return {
+      users: [],
+    };
+  },
+  methods: {
+    goToUser(user) {
+      console.log(user.id);
+      this.$router.push("/profile/" + user.id);
+    },
+  },
+  mounted() {
+    this.$store.dispatch("getUsers").then((users) => {
+      console.log(users);
+      this.users = users;
+    });
+  },
 };
 </script>
 
@@ -200,12 +204,13 @@ export default {
     }
   }
   &__top {
-    display: flex;
-    justify-content: space-between;
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(239px, 1fr));
+    gap: 20px;
   }
 }
 .tickets-user {
-  margin-top: 16px;
   width: 239px;
   border: 1px solid #dadada;
   &:hover {
@@ -221,8 +226,7 @@ export default {
     text-transform: capitalize;
   }
   &__text {
-    margin-top: 4px;
-    margin-left: 17px;
+    margin: 4px 0 4px 17px;
     font-weight: 400;
     font-size: 12px;
     line-height: 17px;
@@ -296,6 +300,15 @@ export default {
     display: flex;
     flex-wrap: wrap;
     justify-content: end;
+  }
+  &__input {
+    display: block;
+    width: 100%;
+    margin-bottom: 16px;
+    font-weight: 600;
+    font-size: 11px;
+    line-height: 15px;
+    padding: 10px 20px;
   }
   &__textarea {
     display: block;
