@@ -62,7 +62,7 @@
 
 <script>
 // @ is an alias to /src
-
+import Swal from "sweetalert2";
 export default {
   name: "PostView",
   data: function () {
@@ -82,8 +82,15 @@ export default {
         comment: this.comment,
         postId: this.$route.params.id,
       };
-      console.log(payload);
-      this.$store.dispatch("createComment", payload);
+      this.$store.dispatch("createComment", payload).then(() => {
+        this.name = "";
+        this.email = "";
+        this.comment = "";
+        Swal.fire({
+          title: "Отправлено",
+          text: "Ваш комментарий успешно отправлен",
+        });
+      });
     },
   },
   mounted() {
@@ -92,8 +99,6 @@ export default {
       .then((post) => {
         this.post = post;
         return this.$store.dispatch("getUser", post.userId);
-        // this.user = user;
-        // return this.$store.dispatch("getPosts", this.$route.params.id);
       })
       .then((user) => {
         this.user = user;

@@ -37,18 +37,15 @@
               {{ post.body }}
             </p>
           </div>
-          <!-- <div class="post__right">
-            <h3 class="post__heading">
-              Twenty One Pilots <span>12.01.22</span>
-            </h3>
-            <p class="post__text">
-              Просто шикарный альбом, Пилоты после Blurryface решили не идти
-              проторенной дорожкой, и сделали что то новое. На мой взгляд у них
-              на 100% получилось, альбом слушается на одном дыхании, каждая
-              песня чем то запоминается, естественно нужно понимать тексты,
-              чтобы вникнуть до конца во весь сюжет и атмосферу альбома....
-            </p>
-          </div> -->
+        </div>
+        <div class="post__more">
+          <button
+            @click="showAll"
+            v-if="isMoreBtn"
+            class="post__more-btn btn-secondary"
+          >
+            Показать все
+          </button>
         </div>
       </div>
     </div>
@@ -70,7 +67,6 @@
 
 <script>
 // @ is an alias to /src
-
 export default {
   name: "ProfileView",
   data: function () {
@@ -79,9 +75,15 @@ export default {
         company: {},
       },
       posts: [],
+      cachePosts: [],
+      isMoreBtn: true,
     };
   },
   methods: {
+    showAll() {
+      this.posts = Array.from(this.cachePosts);
+      this.isMoreBtn = false;
+    },
     goToPost(postId) {
       this.$router.push("/post/" + postId);
     },
@@ -94,7 +96,8 @@ export default {
         return this.$store.dispatch("getPosts", this.$route.params.id);
       })
       .then((posts) => {
-        this.posts = posts;
+        this.posts = posts.slice(0, 3);
+        this.cachePosts = posts;
       });
   },
 };
@@ -223,6 +226,10 @@ export default {
     }
   }
   &__text {
+    height: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     font-weight: 400;
     font-size: 12px;
     line-height: 17px;
@@ -231,6 +238,14 @@ export default {
   &__text--content {
     font-size: 16px;
     line-height: 22px;
+  }
+  &__more {
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+  }
+  &__more-btn {
+    padding: 10px 20px;
   }
 }
 .public {
